@@ -1,0 +1,30 @@
+# Runs on every push and pull request: static workflow checks, toy-data tests
+# and shell syntax checks.
+name: checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: pip install pandas numpy scikit-learn matplotlib pyyaml
+
+      - name: Static workflow checks
+        run: python tests/check_workflow.py
+
+      - name: Toy-data tests
+        run: bash tests/run_toy_tests.sh
+
+      - name: Shell syntax
+        run: for f in install.sh workflow/scripts/*.sh tests/*.sh; do bash -n "$f"; done

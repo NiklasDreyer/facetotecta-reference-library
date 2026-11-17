@@ -1,0 +1,10 @@
+# Environment that runs Snakemake itself (created by install.sh).
+# Each rule gets its own environment from the other files in this folder.
+name: yfacet-snakemake
+channels: [conda-forge, bioconda]
+dependencies:
+  - python=3.11
+  - snakemake>=8.20
+  - snakemake-executor-plugin-slurm   # submits jobs to SLURM
+  - pandas
+  - pyyaml

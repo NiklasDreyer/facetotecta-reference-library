@@ -1,0 +1,8 @@
+# Read trimming: Trimmomatic and BBTools (bbduk.sh, reformat.sh,
+# filterbyname.sh). seqkit and pigz are used for counts and compression.
+channels: [conda-forge, bioconda]
+dependencies:
+  - trimmomatic
+  - bbmap
+  - seqkit
+  - pigz

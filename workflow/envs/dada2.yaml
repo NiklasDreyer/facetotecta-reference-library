@@ -1,0 +1,6 @@
+# ASV inference with DADA2 (Callahan et al. 2016) in R.
+channels: [conda-forge, bioconda]
+dependencies:
+  - r-base>=4.3
+  - bioconductor-dada2
+  - r-optparse

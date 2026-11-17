@@ -1,0 +1,13 @@
+# The iterative phylogenetic filter calls MAFFT, Gblocks and IQ-TREE from
+# Python and reads the trees with ete3.
+channels: [conda-forge, bioconda]
+dependencies:
+  - mafft
+  - gblocks
+  - iqtree>=2.0.3,<3
+  - vsearch
+  - python=3.11
+  - biopython
+  - pandas
+  - ete3
+  - six

@@ -1,0 +1,10 @@
+# One row per Illumina amplicon library. Columns (tab-separated):
+#   sample  - bulk sample name (Y1 = Oct 2018, ~600 larvae; Y2 = Jun 2019, ~3,000 larvae)
+#   marker  - COX1 or 18S (must match the locus names in config.yaml)
+#   r1, r2  - paths to the raw paired-end FASTQ files
+# Lines starting with "#" are ignored.
+sample	marker	r1	r2
+Y1	COX1	data/raw/illumina/Y1_COX1_R1.fastq.gz	data/raw/illumina/Y1_COX1_R2.fastq.gz
+Y2	COX1	data/raw/illumina/Y2_COX1_R1.fastq.gz	data/raw/illumina/Y2_COX1_R2.fastq.gz
+Y1	18S	data/raw/illumina/Y1_18S_R1.fastq.gz	data/raw/illumina/Y1_18S_R2.fastq.gz
+Y2	18S	data/raw/illumina/Y2_18S_R1.fastq.gz	data/raw/illumina/Y2_18S_R2.fastq.gz

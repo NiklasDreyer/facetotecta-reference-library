@@ -1,0 +1,6 @@
+# TransDecoder: translation screen of COX1 ASVs for stop codons and frameshifts.
+channels: [conda-forge, bioconda]
+dependencies:
+  - transdecoder
+  - python=3.11
+  - biopython

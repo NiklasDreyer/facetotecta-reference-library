@@ -1,0 +1,11 @@
+# Alignment, trimming and maximum-likelihood trees:
+# MAFFT, Gblocks 0.91b, IQ-TREE 2 (ModelFinder, UFBoot, SH-aLRT).
+channels: [conda-forge, bioconda]
+dependencies:
+  - mafft
+  - gblocks
+  - iqtree>=2.0.3,<3
+  - seqkit
+  - python=3.11
+  - biopython
+  - pandas

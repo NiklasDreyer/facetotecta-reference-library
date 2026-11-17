@@ -1,0 +1,11 @@
+# Benchmark of taxonomic assignment: BLAST+ (top hit) and VSEARCH (SINTAX),
+# with Python for cross-validation, ROC curves and plots.
+channels: [conda-forge, bioconda]
+dependencies:
+  - blast>=2.9
+  - vsearch>=2.15
+  - python=3.11
+  - biopython
+  - pandas
+  - numpy
+  - matplotlib

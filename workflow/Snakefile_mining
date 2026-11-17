@@ -1,0 +1,30 @@
+# =============================================================================
+# Snakefile_mining: mine public metabarcoding datasets for Facetotecta.
+#
+# Run AFTER the main workflow (it uses its reference databases, Sanger library
+# and authentic sequences). Datasets are listed in config/public_datasets.tsv.
+#
+#   conda activate yfacet-snakemake
+#   snakemake -s workflow/Snakefile_mining --profile profiles/slurm -n
+#   snakemake -s workflow/Snakefile_mining --profile profiles/slurm
+#
+# Downloads run on the login node (local rules), everything else on SLURM.
+# =============================================================================
+
+from snakemake.utils import min_version
+min_version("8.0")
+
+configfile: "config/config.yaml"
+
+include: "rules/common.smk"
+include: "rules/references.smk"
+include: "rules/placement.smk"
+include: "rules/mining.smk"
+
+
+rule all_mining:
+    # Default target for the mining workflow.
+    default_target: True
+    input:
+        f"{OUT}/mining/summary/gain_by_dataset.tsv",
+        f"{OUT}/mining/dwc/occurrence.tsv"

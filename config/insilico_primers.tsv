@@ -1,0 +1,7 @@
+# Primer pairs tested in silico against the reference library (Section 2.13).
+# Columns: name, marker, forward (5'->3'), reverse (5'->3'), reference.
+# Add the primers you used for your own Illumina amplicons (Table S2) as well.
+name	marker	forward	reverse	reference
+Leray_mlCOIintF_jgHCO2198	COX1	GGWACWGGWTGAACWGTWTAYCCYCC	TAIACYTCIGGRTGICCRAARAAYCA	Leray et al. 2013
+V4_TAReuk454FWD1_TAReukREV3	18S	CCAGCASCYGCGGTAATTCC	ACTTTCGTTCTTGATYRA	Stoeck et al. 2010
+V9_1389F_1510R	18S	TTGTACACACCGCCC	CCTTCYGCAGGTTCACCTAC	Amaral-Zettler et al. 2009

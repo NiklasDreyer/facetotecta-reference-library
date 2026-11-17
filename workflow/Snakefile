@@ -1,0 +1,97 @@
+# =============================================================================
+# Snakefile: main workflow for the Facetotecta (y-larva) reference library.
+#
+# Starts from:
+#   - curated Sanger FASTA per locus (data/sanger/{locus}.fasta)
+#   - raw Illumina MiSeq reads (config/illumina_samples.tsv)
+#   - PacBio Iso-Seq CCS reads (config: pacbio.ccs_fastq)
+# and produces the reference library, authenticated HTS sequences, MOTU
+# delimitations, richness estimates, primer coverage and the assignment
+# benchmark, plus results/summary_numbers.tsv.
+#
+# Public metabarcoding data are mined in a separate workflow
+# (workflow/Snakefile_mining), run after this one.
+#
+# Run (on the cluster, from the repository root):
+#   conda activate yfacet-snakemake
+#   snakemake --profile profiles/slurm -n     # dry run: lists all jobs
+#   snakemake --profile profiles/slurm        # run
+# =============================================================================
+
+# Snakemake 8 or later is required (SLURM executor plugin, rule "name:").
+from snakemake.utils import min_version
+min_version("8.0")
+
+configfile: "config/config.yaml"
+
+# Shared settings first, then one rule file per part of the analysis.
+include: "rules/common.smk"
+include: "rules/references.smk"
+include: "rules/sanger.smk"
+include: "rules/illumina.smk"
+include: "rules/pacbio.smk"
+include: "rules/authenticate.smk"
+include: "rules/delimitation.smk"
+include: "rules/richness.smk"
+include: "rules/primers.smk"
+include: "rules/placement.smk"
+include: "rules/benchmark.smk"
+
+# -----------------------------------------------------------------------------
+# Final targets. Comment out a block to skip that part of the analysis.
+# -----------------------------------------------------------------------------
+ALL_TARGETS = []
+
+# Sanger library: cleaned loci, translation reports, concatenated tree.
+ALL_TARGETS += expand(f"{OUT}/sanger/{{locus}}/{{locus}}.gb.fasta", locus=SANGER_LOCI)
+ALL_TARGETS += expand(f"{OUT}/sanger/{{locus}}/{{locus}}.translation_report.tsv", locus=list(CODING))
+ALL_TARGETS += [f"{OUT}/sanger/concat/iqtree/concat.treefile"]
+
+# Illumina: QC, read counts, final ASVs per marker.
+ALL_TARGETS += [f"{OUT}/illumina/qc/multiqc_report.html"]
+ALL_TARGETS += expand(f"{OUT}/illumina/stats/{{unit}}.metrics.tsv", unit=UNITS.index)
+ALL_TARGETS += expand(f"{OUT}/illumina/{{marker}}/final.fasta", marker=ILL_MARKERS)
+
+# PacBio: QC, read counts, extracted loci, mapper comparison.
+ALL_TARGETS += [f"{OUT}/pacbio/qc/raw.seqkit.tsv", f"{OUT}/pacbio/qc/bbduk_hist.done",
+                f"{OUT}/pacbio/stats/cleaning.metrics.tsv",
+                f"{OUT}/pacbio/COX1/minimap2.flagstat.txt"]
+ALL_TARGETS += [f"{OUT}/pacbio/{l}/final.fasta" for l in HTS_LOCI if pacbio_has(l)]
+
+# Authentication and per-platform subsets.
+ALL_TARGETS += expand(f"{OUT}/authenticate/{{locus}}/authentic.fasta", locus=HTS_LOCI)
+ALL_TARGETS += expand(f"{OUT}/authenticate/{{locus}}/seq_platforms.tsv", locus=HTS_LOCI)
+
+# Delimitation (all datasets, all methods), MCMC support, sweeps, congruence.
+ALL_TARGETS += expand(f"{OUT}/delim/{{ds}}/motu_counts.metrics.tsv", ds=DELIM_NAMES)
+ALL_TARGETS += expand(f"{OUT}/delim/{{ds}}/{{model}}/mcmc.done", ds=DELIM_NAMES, model=["mptp", "ptp"])
+ALL_TARGETS += expand(f"{OUT}/delim/{{ds}}/sweep/threshold_sweep.tsv", ds=DELIM_NAMES)
+ALL_TARGETS += [f"{OUT}/delim/congruence/motu_grades.tsv"]
+
+# Richness and platform overlap.
+ALL_TARGETS += [f"{OUT}/richness/inext_estimates.tsv"]
+ALL_TARGETS += expand(f"{OUT}/richness/overlap_{{locus}}.tsv", locus=HTS_LOCI)
+
+# Primer coverage (against facetotectans and non-targets).
+ALL_TARGETS += expand(f"{OUT}/primers/{{pp}}/{{set}}_mismatches.tsv",
+                      pp=[p for p in PRIMER_NAMES if PRIMERS.loc[p, "marker"] in BENCH_MARKERS],
+                      set=["facet", "nontarget"])
+ALL_TARGETS += [f"{OUT}/primers/primer_mismatch_summary.pdf"]
+
+# Assignment benchmark (full length + each primer region) and placement test.
+for _m in BENCH_MARKERS:
+    ALL_TARGETS += expand(f"{OUT}/benchmark/{_m}/{{region}}/thresholds.tsv", region=bench_regions(_m))
+    ALL_TARGETS += [f"{OUT}/benchmark/{_m}/placement_nontarget.metrics.tsv"]
+
+# The summary table must be included after ALL_TARGETS is complete.
+include: "rules/summary.smk"
+
+
+rule all:
+    # Default target: everything above plus the summary table.
+    # default_target is needed because the environment rules in common.smk
+    # are defined first.
+    default_target: True
+    input:
+        ALL_TARGETS,
+        f"{OUT}/summary_numbers.tsv"

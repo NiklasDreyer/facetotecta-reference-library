@@ -1,0 +1,11 @@
+# Long-read handling: BBMap (mapPacBio.sh, bbduk.sh, reformat.sh), minimap2,
+# samtools and pysam.
+channels: [conda-forge, bioconda]
+dependencies:
+  - bbmap
+  - minimap2
+  - samtools
+  - python=3.11
+  - pysam
+  - biopython
+  - seqkit

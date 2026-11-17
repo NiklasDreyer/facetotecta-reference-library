@@ -1,0 +1,13 @@
+# metaMATE (Andujar et al. 2021): NUMT and error filtering of COX1 ASVs.
+# Installed from GitHub with pip. MAFFT is included for aligning the ASVs.
+# CHECK on first build: if pip fails, see https://github.com/tjcreedy/metamate
+channels: [conda-forge, bioconda]
+dependencies:
+  - python=3.9
+  - pip
+  - mafft
+  - r-base
+  - r-ape
+  - fasttree
+  - pip:
+      - git+https://github.com/tjcreedy/metamate.git

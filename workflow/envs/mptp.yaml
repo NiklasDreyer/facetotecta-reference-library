@@ -1,0 +1,7 @@
+# mPTP (Kapli et al. 2017): multi-rate and single-rate PTP delimitation.
+channels: [conda-forge, bioconda]
+dependencies:
+  - mptp
+  - python=3.11
+  - ete3
+  - six

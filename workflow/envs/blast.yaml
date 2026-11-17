@@ -1,0 +1,8 @@
+# BLAST+ for screening, classification and read recovery, with Python helpers.
+channels: [conda-forge, bioconda]
+dependencies:
+  - blast>=2.9
+  - python=3.11
+  - biopython
+  - pandas
+  - seqkit

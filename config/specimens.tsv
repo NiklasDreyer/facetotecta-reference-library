@@ -1,0 +1,13 @@
+# One row per Sanger-sequenced specimen (Table S1). Columns (tab-separated):
+#   specimen_id    - must match the start of the Sanger FASTA headers
+#   site           - e.g. Sesoko, Keelung, Green_Island, Azores, White_Sea, Malaysia, Antarctica
+#   region         - larger unit used in figures (e.g. Okinawa, Taiwan, Azores)
+#   sampling_event - one plankton haul or collection day (used for incidence-based richness)
+#   date           - YYYY-MM-DD
+#   lat, lon       - decimal degrees
+#   stage          - y-nauplius / y-cyprid
+#   voucher        - catalogue number of the slide (e.g. NHMD-...)
+#   new            - yes if sequenced for this study, no if published before
+# The row below is an example; replace it with your data.
+specimen_id	site	region	sampling_event	date	lat	lon	stage	voucher	new
+EXAMPLE001	Sesoko	Okinawa	Sesoko_2018-10-02	2018-10-02	26.636	127.866	y-cyprid	NHMD-XXXXXX	yes

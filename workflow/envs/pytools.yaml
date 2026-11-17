@@ -1,0 +1,13 @@
+# General Python tools used by the summary, congruence, overlap and benchmark
+# scripts.
+channels: [conda-forge, bioconda]
+dependencies:
+  - python=3.11
+  - biopython
+  - pandas
+  - numpy
+  - scikit-learn
+  - matplotlib
+  - upsetplot
+  - ete3
+  - six

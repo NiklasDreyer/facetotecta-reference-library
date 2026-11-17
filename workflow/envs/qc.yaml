@@ -1,0 +1,9 @@
+# Read quality reports: FastQC (Illumina), NanoPlot and NanoQC (PacBio CCS),
+# MultiQC to merge reports, seqkit for read counts.
+channels: [conda-forge, bioconda]
+dependencies:
+  - fastqc
+  - multiqc
+  - nanoplot
+  - nanoqc
+  - seqkit

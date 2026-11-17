@@ -1,0 +1,5 @@
+# SRA Toolkit for downloading public metabarcoding runs.
+channels: [conda-forge, bioconda]
+dependencies:
+  - sra-tools>=3
+  - pigz

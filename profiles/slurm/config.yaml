@@ -1,0 +1,85 @@
+# =============================================================================
+# Snakemake (v8+) profile for SLURM.
+# Use it with:  snakemake --profile profiles/slurm
+# Requires the plugin "snakemake-executor-plugin-slurm" (installed by install.sh).
+# Edit slurm_account and slurm_partition for your cluster.
+# =============================================================================
+
+# Submit every job to SLURM.
+executor: slurm
+# Maximum number of jobs queued or running at the same time.
+jobs: 100
+# Build and use a conda environment for each rule (workflow/envs/*.yaml).
+software-deployment-method: conda
+# Shared folder for the conda environments, so they are built once.
+conda-prefix: ".snakemake/conda"
+# Wait for files on shared file systems to appear.
+latency-wait: 120
+# Rerun jobs whose output is incomplete after a crash.
+rerun-incomplete: true
+# Keep going with independent jobs when one fails.
+keep-going: true
+# Print the shell commands in the log.
+printshellcmds: true
+# Retry a failed job once (e.g. node failure).
+retries: 1
+
+# Default resources for every job. runtime is in minutes.
+default-resources:
+  slurm_account: "YOUR_ACCOUNT"
+  slurm_partition: "YOUR_PARTITION"
+  runtime: 120
+  mem_mb: 8000
+
+# Larger resources for the heavy rules (rule names as in workflow/rules).
+set-resources:
+  iqtree_sanger_concat:
+    runtime: 4320
+    mem_mb: 32000
+  authenticate:
+    runtime: 4320
+    mem_mb: 32000
+  delim_iqtree:
+    runtime: 1440
+    mem_mb: 16000
+  delim_mptp_mcmc:
+    runtime: 1440
+    mem_mb: 8000
+  pacbio_map_cox1:
+    runtime: 600
+    mem_mb: 24000
+  dada2:
+    runtime: 600
+    mem_mb: 32000
+  benchmark_loo:
+    runtime: 1440
+    mem_mb: 16000
+  pacbio_deepconsensus:
+    runtime: 2880
+    mem_mb: 64000
+  mining_authenticate:
+    runtime: 4320
+    mem_mb: 32000
+  pacbio_blast_rrna:
+    runtime: 720
+    mem_mb: 16000
+
+# Threads per rule (the SLURM plugin requests cpus-per-task = threads).
+set-threads:
+  iqtree_sanger_concat: 16
+  authenticate: 16
+  delim_iqtree: 8
+  pacbio_map_cox1: 16
+  pacbio_minimap2: 8
+  dada2: 8
+  blast_screen: 8
+  pacbio_blast_rrna: 16
+  pacbio_cox1_rescue: 16
+  mining_authenticate: 16
+  mining_assign: 8
+  place_queries: 8
+  placement_reference: 8
+  benchmark_loo: 8
+  trimmomatic: 4
+  metamate_cox1: 8
+  mafft_sanger: 4

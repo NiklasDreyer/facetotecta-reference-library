@@ -1,0 +1,4 @@
+# cutadapt for primer removal in public datasets.
+channels: [conda-forge, bioconda]
+dependencies:
+  - cutadapt

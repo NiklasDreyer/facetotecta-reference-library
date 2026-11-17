@@ -1,0 +1,9 @@
+# VSEARCH (Rognes et al. 2016) for dereplication, clustering and SINTAX,
+# with Python for parsing and plotting.
+channels: [conda-forge, bioconda]
+dependencies:
+  - vsearch>=2.15
+  - python=3.11
+  - biopython
+  - pandas
+  - matplotlib

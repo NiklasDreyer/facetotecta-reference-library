@@ -1,0 +1,13 @@
+# Public metabarcoding datasets to mine (Table S5). Used only by
+# workflow/Snakefile_mining. Columns (tab-separated):
+#   dataset   - short ID without spaces (e.g. RedSea_18S_2019)
+#   marker    - COX1, 18S or 16S
+#   runs      - SRA run accessions separated by ";" (e.g. SRR123;SRR124)
+#   layout    - PE or SE
+#   fwd, rev  - primer sequences used in that study (5'->3')
+#   region    - region name for the map and the table
+#   lat, lon  - representative coordinates (decimal degrees)
+#   citation  - source publication
+# The row below is an example. Replace it with the real datasets.
+dataset	marker	runs	layout	fwd	rev	region	lat	lon	citation
+EXAMPLE_18S	18S	SRR0000000	PE	CCAGCASCYGCGGTAATTCC	ACTTTCGTTCTTGATYRA	Example region	0.0	0.0	Author et al. 2020

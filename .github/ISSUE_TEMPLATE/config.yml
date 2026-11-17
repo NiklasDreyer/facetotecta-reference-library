@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Contact the corresponding author
+    url: mailto:dreyer@snm.ku.dk
+    about: For questions about data access or collaboration

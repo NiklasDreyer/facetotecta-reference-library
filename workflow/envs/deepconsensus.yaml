@@ -1,0 +1,11 @@
+# Optional: DeepConsensus error correction. Needs SUBREAD BAM files and
+# Sequel II chemistry. Only used when pacbio.deepconsensus.enabled is true.
+channels: [conda-forge, bioconda]
+dependencies:
+  - python=3.9
+  - pip
+  - pbccs
+  - actc
+  - samtools
+  - pip:
+      - deepconsensus[cpu]==1.2.0

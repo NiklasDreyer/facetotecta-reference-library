@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+message: "If you use this workflow or the Facetotecta reference library, please cite it as below."
+title: "Facetotecta reference library: a Snakemake workflow for the dark diversity of crustacean y-larvae"
+type: software
+version: 0.1.0
+date-released: 2026-11-17
+license: MIT
+repository-code: "https://github.com/NiklasDreyer/facetotecta-reference-library"
+keywords:
+  - Facetotecta
+  - y-larvae
+  - dark taxa
+  - DNA barcoding
+  - metabarcoding
+  - environmental DNA
+  - PacBio Iso-Seq
+  - species delimitation
+  - Snakemake
+authors:
+  - family-names: Dreyer
+    given-names: Niklas
+    affiliation: "Natural History Museum of Denmark, University of Copenhagen"
+    email: dreyer@snm.ku.dk
+  - family-names: Olesen
+    given-names: Jørgen
+    affiliation: "Natural History Museum of Denmark, University of Copenhagen"
+  - family-names: Jensen
+    given-names: Mads Reinholdt
+    affiliation: "UiT The Arctic University of Norway"
+  - family-names: Bernot
+    given-names: James P.
+    affiliation: "University of Connecticut"
+  - family-names: Wong
+    given-names: Yue Him
+    affiliation: "Shenzhen University"
+  - family-names: Machida
+    given-names: Ryuji
+    affiliation: "Academia Sinica"
+  - family-names: Chan
+    given-names: Benny Kwok Kan
+    affiliation: "Academia Sinica"
+    email: chankk@as.sinica.edu.tw

@@ -1,0 +1,7 @@
+# iNEXT (Hsieh et al. 2016): rarefaction, extrapolation and Chao estimates.
+channels: [conda-forge, bioconda]
+dependencies:
+  - r-base>=4.3
+  - r-inext
+  - r-ggplot2
+  - r-optparse

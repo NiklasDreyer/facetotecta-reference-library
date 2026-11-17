@@ -1,0 +1,249 @@
+# =============================================================================
+# config.yaml
+# -----------------------------------------------------------------------------
+# Every path, parameter and threshold used by the y-larva (Facetotecta)
+# pipeline. The values reproduce the methods in manuscript_v1 unless a comment
+# says otherwise. Values marked "NEW" belong to the extra analyses proposed for
+# the Molecular Ecology Resources submission. Values marked "CHECK" conflict
+# within manuscript_v1 or are missing from it; set them before running.
+# =============================================================================
+
+# ---- General -----------------------------------------------------------------
+# Folder where all results are written (relative to the repository root).
+outdir: "results"
+
+# ---- Input tables --------------------------------------------------------------
+# One row per Illumina library (sample x marker); see the file for its columns.
+illumina_samples: "config/illumina_samples.tsv"
+# One row per Sanger-sequenced specimen (site, date, sampling event, voucher).
+specimens: "config/specimens.tsv"
+
+# ---- Loci ---------------------------------------------------------------------
+# Loci with high-throughput data (Illumina and/or PacBio). These go through the
+# combined authentication filter and delimitation.
+hts_loci: ["COX1", "18S", "16S"]
+
+# ---- Sanger reference library -----------------------------------------------
+sanger:
+  # Folder with one curated FASTA per locus, named {locus}.fasta. These are
+  # the sequences already trimmed, assembled and checked in Geneious Prime
+  # (that step is manual and stays outside the pipeline). Each header must
+  # START with the specimen ID; anything after the first space or "|" is ignored.
+  dir: "data/sanger"
+  loci: ["COX1", "12S", "16S", "18S", "28S", "H3"]
+  # Protein-coding loci and their NCBI genetic code tables:
+  # 5 = invertebrate mitochondrial (COX1); 1 = standard (H3).
+  coding: {COX1: 5, H3: 1}
+
+# ---- References used for screening and classification -----------------------
+# Download these yourself (URLs in README) and give the local paths. The
+# pipeline builds two BLAST databases per marker from them:
+#   "public"    = public reference only (baseline for the public-data mining)
+#   "augmented" = public reference + our Sanger library
+references:
+  # MIDORI "Longest" COX1 (manuscript_v1 used v1.1; MIDORI2 is current).
+  midori_cox1: "resources/db/MIDORI2_LONGEST_NUC_CO1.fasta"
+  # MIDORI "Longest" lrRNA (16S), used for the PacBio 16S BLAST step.
+  midori_16s: "resources/db/MIDORI2_LONGEST_NUC_lrRNA.fasta"
+  # SILVA SSU Ref NR99 (all eukaryotic 18S). manuscript_v1 used "all
+  # eukaryotic 18S" for the Illumina screen and "animal 18S" for PacBio; the
+  # pipeline keeps eukaryotes and builds a Metazoa-only subset automatically.
+  silva_ssu: "resources/db/SILVA_138.2_SSURef_NR99_tax_silva.fasta"
+
+# ---- Illumina amplicons (Sections 2.4 and 2.7) ---------------------------------
+illumina:
+  # Trimmomatic step, exactly as in manuscript_v1:
+  # PE -phred33 ILLUMINACLIP:TruSeq3-PE.fa:2:30:10:2:True LEADING:3 TRAILING:3 MINLEN:3
+  # CHECK: MINLEN:3 looks like a typo (BBDuk then removes reads <100 bp anyway).
+  trimmomatic_steps: "LEADING:3 TRAILING:3 MINLEN:3"
+  trimmomatic_clip: "2:30:10:2:True"
+  # Second trimming pass with BBDuk, exactly as in manuscript_v1.
+  # CHECK: trimq=33 is very strict for MiSeq data; report how many reads survive.
+  bbduk: "qtrim=rl trimq=33 minlen=100 ktrim=r k=23 mink=11 hdist=1 tpe tbo"
+  # DADA2 settings (developer tutorial defaults).
+  dada2:
+    # Set false to analyse forward reads only, e.g. when a COX1 amplicon is
+    # too long for 2 x 150 bp reads to overlap. CHECK: amplicon lengths.
+    merge_pairs: true
+    trunc_len_f: 0
+    trunc_len_r: 0
+    max_ee_f: 2
+    max_ee_r: 2
+    trunc_q: 2
+    min_overlap: 12
+    chimera_method: "consensus"
+  # BLAST screen for contaminants. ASVs are kept when their top hit belongs
+  # to one of these taxa (manuscript_v1: Facetotecta or "unknown Arthropoda").
+  screen_keep_taxa: ["Facetotecta", "Arthropoda"]
+  screen_evalue: 1.0e-20
+  # COX1 translation screen with TransDecoder (manuscript_v1).
+  transdecoder:
+    genetic_code: "Mitochondrial-Invertebrates"
+    min_protein_len: 30
+    # An ASV passes when its longest stop-free ORF covers at least this
+    # fraction of the ASV (screen for stop codons and frameshifts).
+    min_orf_fraction: 0.95
+  # NEW: NUMT and error filtering with metaMATE (Andujar et al. 2021).
+  metamate:
+    enabled: true
+    # Expected COX1 amplicon length in bp. CHECK: set from your primers.
+    expected_length: 313
+    specs: "resources/metamate/specifications.txt"
+    # "auto" chooses the threshold set with the best accuracy score that
+    # keeps every verified-authentic ASV. Use an integer to force a result index.
+    result_index: "auto"
+
+# ---- PacBio Iso-Seq CCS reads (Sections 2.5 and 2.8) ---------------------------
+pacbio:
+  # CCS reads as FASTQ (required).
+  ccs_fastq: "data/raw/pacbio/ccs.fastq.gz"
+  # Optional CCS BAM with "np" (number of passes) tags. When given, reads with
+  # fewer than min_passes are removed, as in manuscript_v1. Leave "" to skip.
+  ccs_bam: ""
+  min_passes: 10
+  # Phred mean-quality minimum (manuscript_v1: Q40).
+  min_mean_q: 40
+  # FASTA with the SMARTer primers, oligo-dT and template-switching oligo to
+  # remove. CHECK: manuscript_v1 mentions both the Clontech SMARTer kit and
+  # "NEBNext TSO". Put the sequences you actually used in this file.
+  adapters: "resources/pacbio/primers_tso.fasta"
+  # BBDuk adapter trimming, as in manuscript_v1 (ktrim=r and ktrim=l are run
+  # as two passes, because BBDuk takes only one ktrim value per call).
+  bbduk_trim: "k=21 mink=11 hdist=2"
+  # Entropy filter, as in manuscript_v1.
+  bbduk_entropy: "entropy=0.5 entropywindow=50 entropyk=5"
+  # DeepConsensus needs the SUBREAD BAM and Sequel II chemistry. CHECK whether
+  # this applies. If false, the step is skipped.
+  deepconsensus:
+    enabled: false
+    subreads_bam: ""
+    checkpoint: "resources/deepconsensus/checkpoint"
+  # COX1: map to the full-length Type AE* COX1 (1,527 bp) with mapPacBio.sh.
+  cox1_reference: "resources/reference/typeAE_COX1.fasta"
+  # mapPacBio.sh parameters from manuscript_v1 ("high sensitivity"). Two
+  # changes: "qin=42" is not a valid BBMap value (qin is the quality offset),
+  # so qin=33 is used; and "k=script" was dropped as a typo.
+  mappacbio: "maxlen=1527 minlen=100 idtag ow int=f qin=33 minratio=0.15 ordered maxindel1=40 maxindel2=400 vslow"
+  mappacbio_mem: "20g"
+  # minimap2 run for comparison only (manuscript_v1 reports far fewer reads).
+  minimap2: "-ax splice:hq -uf -C5"
+  # Genetic code used to discard reads with frameshifting indels or stops.
+  cox1_table: 5
+  # NEW: also recover divergent COX1 reads by BLAST against the Sanger COX1
+  # library (mapping to one reference can miss them).
+  cox1_blast_rescue: true
+  cox1_blast_evalue: 1.0e-20
+  # rRNA loci recovered by BLAST (manuscript_v1: 18S and 16S).
+  blast_loci: ["18S", "16S"]
+  rrna_blast_evalue: 1.0e-50
+  rrna_num_alignments: 1000
+
+# ---- Authentication filter (Section 2.9) ---------------------------------------
+authenticate:
+  # Pre-clustering identity before the phylogenetic filter. manuscript_v1 used
+  # 0.97. NEW: 1.0 (dereplication only) is recommended, because 97% removes
+  # most within-species variation that ASAP and PTP need.
+  precluster_id: 0.97
+  # Folder with one outgroup FASTA per locus: {locus}.fasta (crustacean
+  # outgroups, e.g. Ascothoracida, Cirripedia, Copepoda). Provide these yourself.
+  outgroups_dir: "resources/outgroups"
+  # Support needed for a "well-supported, monophyletic Facetotecta".
+  min_shalrt: 80
+  min_ufboot: 95
+  # Tips more than this many times longer than their sister are removed
+  # (Yang & Smith 2014 approach).
+  long_branch_factor: 10
+  # manuscript_v1 criterion (4), interpreted as: remove a high-throughput
+  # sequence whose closest supported clade contains no sequence from any other
+  # platform. CHECK the intended meaning before enabling.
+  require_cross_platform: false
+  max_iterations: 10
+  # IQ-TREE replicates used in each round (manuscript_v1: 10,000 each).
+  ufboot: 10000
+  alrt: 10000
+
+# ---- Phylogenetics of the Sanger library (Section 2.6) ------------------------
+phylogeny:
+  ufboot: 10000
+  alrt: 10000
+
+# ---- Species delimitation (Section 2.10) ---------------------------------------
+delimitation:
+  # VSEARCH identity threshold per locus. CHECK: manuscript_v1 uses 0.95 for
+  # COX1 in the Methods but reports ~97% from ASAP in the Results. Values below
+  # are the ASAP thresholds reported in the Results; edit after rerunning ASAP.
+  vsearch_id:
+    COX1: 0.97
+    12S: 0.97
+    16S: 0.95
+    18S: 0.99
+    28S: 0.99
+    H3: 0.96
+    concat: 0.97
+  # Replicates for the per-dataset IQ-TREE runs used by the tree-based methods.
+  ufboot: 1000
+  alrt: 1000
+  # mPTP (NEW; replaces bPTP). "--single" gives the single-rate PTP model,
+  # i.e. the model behind bPTP; "--multi" gives mPTP.
+  mptp_mcmc_generations: 100000000
+  mptp_mcmc_runs: 5
+  mptp_mcmc_sample: 1000000
+  # ASAP must be installed separately (see install.sh). Set enabled: true
+  # once the binary is on your PATH. The command template is filled in as
+  # {fasta} = aligned FASTA, {outdir} = output folder. CHECK the flags of
+  # your ASAP version (run "asap -h").
+  asap:
+    enabled: false
+    command: "asap -a -d 4 -o {outdir} {fasta}"
+    # Glob (inside outdir) for the best-partition file and its columns.
+    partition_glob: "*Partition_1*.csv"
+  # Threshold sweep (NEW, Fig. S8).
+  sweep_start: 0.90
+  sweep_end: 0.99
+  sweep_step: 0.005
+  # MOTU grading (NEW): the primary dataset is graded using the other methods
+  # and the nuclear locus below.
+  grading_primary: "sanger_COX1"
+  grading_nuclear: "sanger_18S"
+
+# ---- Richness estimation (NEW, Section 2.11) -----------------------------------
+richness:
+  dataset: "sanger_COX1"
+  method: "vsearch"
+  nboot: 999
+  # Extrapolate to this multiple of the observed sample size.
+  endpoint_factor: 2
+
+# ---- Benchmarking assignment (NEW, Section 2.12) -------------------------------
+benchmark:
+  markers: ["COX1", "18S"]
+  # Non-target crustacean groups taken from the public reference. A sequence
+  # belongs to a group when the group name appears in its lineage string.
+  nontarget_groups: ["Cirripedia", "Ascothoracida", "Copepoda", "Ostracoda",
+                     "Branchiura", "Pentastomida", "Mystacocarida",
+                     "Tantulocarida", "Malacostraca"]
+  # Maximum sequences sampled per group (keeps the run time manageable).
+  max_per_group: 2000
+  folds: 10
+  threshold_min: 80
+  threshold_max: 100
+  # Target false-positive rate used to choose a threshold.
+  target_fpr: 0.01
+  seed: 42
+
+# ---- In-silico primer coverage (NEW, Section 2.13) -----------------------------
+primers:
+  table: "config/insilico_primers.tsv"
+  max_mismatch: 3
+  # Number of 3'-terminal bases that must match exactly.
+  three_prime_exact: 3
+
+# ---- Public data mining (separate workflow: workflow/Snakefile_mining) ---------
+mining:
+  datasets: "config/public_datasets.tsv"
+  # Identity and e-value cut-offs from manuscript_v1. NEW: replace them with
+  # the thresholds chosen by the benchmark (results/benchmark/*/thresholds.tsv).
+  identity: {COX1: 92, 16S: 92, 18S: 90}
+  evalue: {COX1: 1.0e-20, 16S: 1.0e-50, 18S: 1.0e-50}
+  # Minimum likelihood weight ratio for a placement inside Facetotecta.
+  min_lwr: 0.9

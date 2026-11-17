@@ -1,0 +1,12 @@
+# Phylogenetic placement: MAFFT --addfragments, RAxML-NG (model evaluation),
+# EPA-ng (placement) and gappa (taxonomic assignment of placements).
+channels: [conda-forge, bioconda]
+dependencies:
+  - mafft
+  - raxml-ng
+  - epa-ng
+  - gappa
+  - iqtree>=2.0.3,<3
+  - python=3.11
+  - pandas
+  - biopython
