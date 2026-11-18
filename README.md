@@ -163,7 +163,7 @@ Step-by-step instructions: **[docs/installation.md](docs/installation.md)** and 
 
 ## Citation
 
-If you use this workflow or the reference library, please cite the manuscript (details will be added on publication) and this repository. Citation metadata is in [`CITATION.cff`](CITATION.cff); GitHub shows it under **"Cite this repository"**.
+If you use this workflow or the reference library, please cite the manuscript (details will be added on publication) and this repository. A Zenodo DOI for the archived code will be added at publication. Citation metadata is in [`CITATION.cff`](CITATION.cff); GitHub shows it under **"Cite this repository"**.
 
 ---
 

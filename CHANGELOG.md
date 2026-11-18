@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+- README: note that a Zenodo DOI will be added at publication.
+
 ## [0.1.0] - 2026-11-17
 
 ### Added
